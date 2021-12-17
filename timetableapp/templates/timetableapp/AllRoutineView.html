@@ -1,0 +1,51 @@
+{% extends 'timetableapp/main.html' %}
+{% load static %}
+{% block content %}
+
+
+<div class="container-fluid">
+
+   
+
+
+    <div class="table-responsive-lg">
+        <table class="table ">
+            <thead class="thead-dark">
+                <tr>
+                    <div class="header__item filter__link">
+                        <th scope="col" class="text-center">Semester Type</th>
+
+                    </div>
+                    <div class="header__item filter__link">
+                        <th class="text-center" scope="col">View</th>
+
+                    </div>
+
+
+                </tr>
+            </thead>
+
+            <tbody>
+
+
+                {% for availableRoutine in availableRoutines %}
+
+                <tr>
+
+
+                    <th scope="row" class="table-light text-center">{{ availableRoutine.semester_type }}</th>
+
+                    <th scope="row" class="table-dark text-center"> <a href="/print-routine/{{availableRoutine.semester_type}}"
+                            class="btn btn-sm btn-danger">View Timetable</a></th>
+
+                </tr>
+
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,203 @@
+{% extends 'timetableapp/main.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    input[type=text],
+    select {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 10px 0px 10px;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    input[type=submit]:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<div class="display" id="routineDiv">
+    <div class="box">
+        <div class="header">
+            Add Routine By Day
+        </div>
+        <!-- <textarea name="" id="" cols="30" rows="10">
+
+            {% for professor in professors %} 
+                  {{professor.professor_name}}
+            {% endfor %}
+
+            {% for room in rooms %} 
+                {{room.classroom_name}}
+            {% endfor %}
+
+            {% for course in courses %} 
+                {{course.course_name}}
+            {% endfor %}
+
+        </textarea> -->
+        <div class="form">
+            <form id="myForm" method="POST">
+                {% csrf_token %}
+
+                <!-- <label for="semester_type">Semester Type</label> -->
+                <select id="semester_type" name="semester_type">
+                    <option value="" disabled selected>Semester Type</option>
+                    <option value="Fall-21">Fall-21</option>
+                    <option value="Spring-21">Spring-21</option>
+                    <option value="Summer-21">Summer-21</option>
+                </select>
+
+                <!-- <label for="day">Day</label> -->
+                <select id="day" name="day">
+                    <option value="" disabled selected>day</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                </select>
+
+                <select id="time_slot" name="time_slot">
+                    <option value="" disabled selected>Time Slot</option>
+                    <option value="09:00-10:25">09:00-10:25</option>
+                    <option value="10:30-11:55">10:30-11:55</option>
+                    <option value="12:00-01:25">12:00-01:25</option>
+                    <option value="01:30-02:25">01:30-02:25</option>
+                    <option value="02:30-03:25">02:30-03:25</option>
+                </select>
+
+                <!-- <label for="semester">Semester</label> -->
+                <select id="semester" name="semester">
+                    <option value="" disabled selected>Semester</option>
+                    <option value="SEM 1">SEM 1</option>
+                    <option value="SEM 2">SEM 2</option>
+                    <option value="SEM 3">SEM 3</option>
+                    <option value="SEM 4">SEM 4</option>
+                    <option value="SEM 5">SEM 5</option>
+                    <option value="SEM 6">SEM 6</option>
+                    <option value="SEM 7">SEM 7</option>
+                    <option value="SEM 8">SEM 8</option>
+                    <option value="SEM 9">SEM 9</option>
+                    <option value="SEM 10">SEM 10</option>
+                    <option value="SEM 11">SEM 11</option>
+                    <option value="SEM 12">SEM 12</option>
+                </select>
+
+                <!-- <label for="room">Room</label> -->
+                <select id="room" name="room">
+                    <option value="" disabled selected>Room</option>
+                    {% for room in rooms %}
+                    <option value="{{room.classroom_name}}">{{room.classroom_name}}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- <label for="course_details">Course</label> -->
+                <select id="course_details" name="course_details">
+                    <option value="" disabled selected>Course</option>
+                    {% for course in courses %}
+                    <option value="{{course.course_id}}-{{course.course_name}}">
+                        {{course.course_id}}-{{course.course_name}}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- <label for="faculty">Faculty</label> -->
+                <select id="faculty" name="faculty">
+                    <option value="" disabled selected>Faculty</option>
+                    {% for professor in professors %}
+                    <option value="{{professor.professor_name}}">{{professor.professor_name}}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="button" value="Save This Day" onclick="validateRoutine()" class="saveButton">
+            </form>
+        </div>
+    </div>
+
+    <img class="gif" alt="books" src="{% static 'media/21903-online-class-animation.gif' %}">
+    <!-- <div class="viewtable">
+        <p>You can view your added classroom here.<a href="{% url 'classroom-view' %}">View Classrooms</a></p>
+    </div> -->
+
+</div>
+
+<script>
+
+    function validateRoutine() {
+        var semester_type = document.getElementById("semester_type").value;
+        var day = document.getElementById("day").value;
+        var time_slot = document.getElementById("time_slot").value;
+        var room = document.getElementById("room").value;
+
+        var data = new FormData();
+        data.append('semester_type', semester_type);
+        data.append('day', day);
+        data.append('time_slot', time_slot);
+        data.append('room', room);
+
+        var xmlhttp = new XMLHttpRequest();
+
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == XMLHttpRequest.DONE) {    
+                if (xmlhttp.status == 200) { 
+                    if (!JSON.parse(xmlhttp.responseText).isValid) {
+                        alert(`Sorry : ${JSON.parse(xmlhttp.responseText).message}`);
+                    }else{
+                        document.getElementById("myForm").submit();
+                    }
+                }
+                else if (xmlhttp.status == 400) {
+                    alert('There was an error 400');
+                }
+                else {
+                    alert('something else other than 200 was returned');
+                }
+            }
+        };
+
+        xmlhttp.open("POST", "http://localhost:8000/validate-routine/", true);
+        xmlhttp.send(data);
+    }
+
+    // $(document).ready(function () { 
+
+    //     var xmlhttp = new XMLHttpRequest();
+
+    //     xmlhttp.onreadystatechange = function () {
+    //         if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+    //             if (xmlhttp.status == 200) {
+    //                 console.log(JSON.parse(JSON.parse(xmlhttp.responseText).professors)[0].fields.professor_name);
+    //             }
+    //             else if (xmlhttp.status == 400) {
+    //                 alert('There was an error 400');
+    //             }
+    //             else {
+    //                 alert('something else other than 200 was returned');
+    //             }
+    //         }
+    //     };
+
+    //     xmlhttp.open("GET", "http://localhost:8000/get-professor", true);
+    //     xmlhttp.send();
+    // });
+
+
+</script>
+
+{% endblock %}
